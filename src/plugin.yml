@@ -1,0 +1,6 @@
+name: LucidDreams
+version: 1.0.0
+description: Makes the night easier for those who are pacifist.
+author: moltendorf
+website: http://dev.bukkit.org/server-mods/moltendorf-luciddreams/
+main: com.moltendorf.bukkit.luciddreams.Plugin
