@@ -13,7 +13,7 @@ public class PlayerData {
 	public boolean hasEffects = false;
 	public boolean readyForEffects = false;
 
-	public BukkitTask taskEnterBed = null;
+	public BukkitTask taskFlagForEffects = null;
 
 	public PlayerData(Player player) {
 		this.player = player;

@@ -53,8 +53,8 @@ public class Listeners implements Listener {
 				player.sendMessage("As you wake, you come to the grave realization that this was not a dream.");
 			}
 
-			if (playerData.taskEnterBed != null) {
-				playerData.taskEnterBed.cancel();
+			if (playerData.taskFlagForEffects != null) {
+				playerData.taskFlagForEffects.cancel();
 			}
 		}
 
@@ -108,9 +108,9 @@ public class Listeners implements Listener {
 		} else {
 			playerData = fetchedPlayerData;
 
-			if (playerData.taskEnterBed != null) {
-				playerData.taskEnterBed.cancel();
-				playerData.taskEnterBed = null;
+			if (playerData.taskFlagForEffects != null) {
+				playerData.taskFlagForEffects.cancel();
+				playerData.taskFlagForEffects = null;
 			}
 		}
 
@@ -130,12 +130,12 @@ public class Listeners implements Listener {
 					}
 
 					playerData.readyForEffects = true;
-					playerData.taskEnterBed = null;
+					playerData.taskFlagForEffects = null;
 				}
 			}
 		};
 
-		playerData.taskEnterBed = Plugin.instance.getServer().getScheduler().runTaskLater(Plugin.instance, runnable, 40);
+		playerData.taskFlagForEffects = Plugin.instance.getServer().getScheduler().runTaskLater(Plugin.instance, runnable, 40);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -212,9 +212,9 @@ public class Listeners implements Listener {
 			}
 
 			playerData.readyForEffects = false;
-		} else if (playerData.taskEnterBed != null) {
-			playerData.taskEnterBed.cancel();
-			playerData.taskEnterBed = null;
+		} else if (playerData.taskFlagForEffects != null) {
+			playerData.taskFlagForEffects.cancel();
+			playerData.taskFlagForEffects = null;
 		}
 
 	}
