@@ -29,8 +29,14 @@ import org.bukkit.scheduler.BukkitTask;
  */
 public class Listeners implements Listener {
 
+	final protected Plugin plugin;
+
 	protected BukkitTask clock = null;
 	protected Map<UUID, PlayerData> players = new LinkedHashMap<>();
+
+	protected Listeners(final Plugin instance) {
+		plugin = instance;
+	}
 
 	protected void removeEffects() {
 		if (clock != null) {
@@ -65,7 +71,7 @@ public class Listeners implements Listener {
 	public void EntityTargetEventHandler(final EntityTargetEvent event) {
 
 		// Are we enabled at all?
-		if (!Plugin.configuration.global.enabled) {
+		if (!plugin.configuration.global.enabled) {
 			return;
 		}
 
@@ -92,7 +98,7 @@ public class Listeners implements Listener {
 	public void PlayerBedEnterEventMonitor(final PlayerBedEnterEvent event) {
 
 		// Are we enabled at all?
-		if (!Plugin.configuration.global.enabled) {
+		if (!plugin.configuration.global.enabled) {
 			return;
 		}
 
@@ -135,14 +141,14 @@ public class Listeners implements Listener {
 			}
 		};
 
-		playerData.taskFlagForEffects = Plugin.instance.getServer().getScheduler().runTaskLater(Plugin.instance, runnable, 40);
+		playerData.taskFlagForEffects = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 40);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void PlayerBedLeaveEventMonitor(final PlayerBedLeaveEvent event) {
 
 		// Are we enabled at all?
-		if (!Plugin.configuration.global.enabled) {
+		if (!plugin.configuration.global.enabled) {
 			return;
 		}
 
@@ -204,7 +210,7 @@ public class Listeners implements Listener {
 							}
 						};
 
-						clock = Plugin.instance.getServer().getScheduler().runTaskLater(Plugin.instance, runnable, 23458 - player.getWorld().getTime());
+						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 23458 - player.getWorld().getTime());
 					}
 				}
 			} else {
@@ -223,7 +229,7 @@ public class Listeners implements Listener {
 	public void PlayerItemConsumeEventMonior(final PlayerItemConsumeEvent event) {
 
 		// Are we enabled at all?
-		if (!Plugin.configuration.global.enabled) {
+		if (!plugin.configuration.global.enabled) {
 			return;
 		}
 
@@ -250,7 +256,7 @@ public class Listeners implements Listener {
 		}
 
 		// Are we enabled at all?
-		if (!Plugin.configuration.global.enabled) {
+		if (!plugin.configuration.global.enabled) {
 			return;
 		}
 
@@ -277,7 +283,7 @@ public class Listeners implements Listener {
 		}
 
 		// Are we enabled at all?
-		if (!Plugin.configuration.global.enabled) {
+		if (!plugin.configuration.global.enabled) {
 			return;
 		}
 
