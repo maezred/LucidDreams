@@ -179,17 +179,15 @@ public class Listeners implements Listener {
 
 					player.sendMessage("This dream world suddenly feels very cold.");
 				} else {
-					int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20. + 1.25 * 20. * 20.);
+					int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
 
 					if (regenerationDuration > duration) {
 						regenerationDuration = duration;
 					}
 
 					player.addPotionEffects(Arrays.asList(new PotionEffect[]{
-						new PotionEffect(PotionEffectType.HEALTH_BOOST, duration, 4, true),
 						new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 						new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),
-						new PotionEffect(PotionEffectType.WEAKNESS, duration, 15, true),
 						new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true)
 					}));
 
