@@ -164,10 +164,12 @@ public class Listeners implements Listener {
 
 		if (playerData.readyForEffects) {
 			// 23458 (the last moment a bed can be used).
-			int duration = 23458 - (int) player.getWorld().getTime();
+			// 23660 (the moment zombies and skeletons begin burning).
+			// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
+			int duration = 24260 - (int) player.getWorld().getTime();
 
-			// 23458 - 12541 (the first moment a bed can be used).
-			if (duration <= 10917) {
+			// 24260 - 12541 (the first moment a bed can be used).
+			if (duration <= 11719) {
 				if (playerData.hasEffects) {
 					int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
 
@@ -208,7 +210,7 @@ public class Listeners implements Listener {
 							}
 						};
 
-						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 23458 - player.getWorld().getTime());
+						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 24260 - player.getWorld().getTime());
 					}
 				}
 			} else {
