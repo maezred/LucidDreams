@@ -181,11 +181,15 @@ public class Listeners implements Listener {
 			} else {
 				playerData.nextWarning = currentWarning + 100;
 			}
+
+			player.sendMessage("You panic from the thought of the monsters.");
 		} else {
 			player.removePotionEffect(PotionEffectType.INVISIBILITY);
 			player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
 			players.remove(id);
+
+			player.sendMessage("You jolt awake as soon as you realize you are not in bed.");
 		}
 	}
 
