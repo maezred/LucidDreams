@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -395,6 +396,26 @@ public class Listeners implements Listener {
 		for (PotionEffect effect : potions) {
 
 		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void PlayerRespawnEventMonitor(PlayerRespawnEvent event) {
+
+		// Are we enabled at all?
+		if (!plugin.configuration.global.enabled) {
+			return;
+		}
+
+		final Player player = event.getPlayer();
+		final UUID id = player.getUniqueId();
+
+		final PlayerData playerData = players.get(id);
+
+		if (playerData == null) {
+			return;
+		}
+
+		players.remove(id);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
