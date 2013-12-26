@@ -137,6 +137,11 @@ public class Listeners implements Listener {
 
 		final UUID id = player.getUniqueId();
 
+		// No cancelling shooting yourself in the foot.
+		if (event.getEntity().getUniqueId() == id) {
+			return;
+		}
+
 		final PlayerData playerData = players.get(id);
 
 		if (playerData == null || !playerData.hasEffects) {
