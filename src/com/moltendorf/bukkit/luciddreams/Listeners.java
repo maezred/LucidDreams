@@ -8,10 +8,14 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -65,6 +69,72 @@ public class Listeners implements Listener {
 		}
 
 		players.clear();
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void EntityDamageByEntityEventHandler(final EntityDamageByEntityEvent event) {
+
+		// Are we enabled at all?
+		if (!plugin.configuration.global.enabled) {
+			return;
+		}
+
+		final Entity damager = event.getDamager();
+
+		if (damager == null || damager.getType() != EntityType.PLAYER) {
+			return;
+		}
+
+		final UUID id = damager.getUniqueId();
+
+		final PlayerData playerData = players.get(id);
+
+		if (playerData == null || !playerData.hasEffects) {
+			return;
+		}
+
+		// Is this entity allowed to be attacked?
+		if (!plugin.configuration.global.disallowed.contains(event.getEntityType())) {
+			return;
+		}
+
+		long currentWarning = damager.getWorld().getFullTime();
+
+		// Convert Entity to Player.
+		final Player player = (Player) damager;
+
+		if (currentWarning > playerData.nextWarning) {
+			// Negate all damage dealt to the entity.
+			event.setDamage(0);
+
+			final double health = player.getHealth();
+
+			int regenerationDuration = 0;
+
+			if (health > 1) {
+				// Give the player a nice warning.
+				player.damage(health / 2.);
+
+				regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
+
+				// Regenerate them back up because we're nice.
+				player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
+			} else {
+				player.damage(0);
+			}
+
+			// The warning period lasts for five seconds or the full duration of the regeneration. Whichever is more.
+			if (regenerationDuration > 100) {
+				playerData.nextWarning = currentWarning + regenerationDuration;
+			} else {
+				playerData.nextWarning = currentWarning + 100;
+			}
+		} else {
+			player.removePotionEffect(PotionEffectType.INVISIBILITY);
+			player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+			players.remove(id);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -176,6 +246,8 @@ public class Listeners implements Listener {
 				if (regenerationDuration > duration) {
 					regenerationDuration = duration;
 				}
+
+				playerData.nextWarning = player.getWorld().getFullTime() + regenerationDuration;
 
 				if (playerData.hasEffects) {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));

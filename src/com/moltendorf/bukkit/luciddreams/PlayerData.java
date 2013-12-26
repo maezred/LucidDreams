@@ -10,6 +10,8 @@ import org.bukkit.scheduler.BukkitTask;
 public class PlayerData {
 	final public Player player;
 
+	public double nextWarning = 0;
+
 	public boolean hasEffects = false;
 	public boolean readyForEffects = false;
 
