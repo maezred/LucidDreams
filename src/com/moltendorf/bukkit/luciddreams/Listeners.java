@@ -53,10 +53,8 @@ public class Listeners implements Listener {
 			Player player = playerData.player;
 
 			if (playerData.hasEffects) {
-				player.removePotionEffect(PotionEffectType.HEALTH_BOOST);
 				player.removePotionEffect(PotionEffectType.INVISIBILITY);
 				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-				player.removePotionEffect(PotionEffectType.WEAKNESS);
 
 				player.removePotionEffect(PotionEffectType.REGENERATION);
 
