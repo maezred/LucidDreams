@@ -170,23 +170,18 @@ public class Listeners implements Listener {
 
 			// 24260 - 12541 (the first moment a bed can be used).
 			if (duration <= 11719) {
+				// Calculate custom duration for regeneration effect.
+				int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
+
+				if (regenerationDuration > duration) {
+					regenerationDuration = duration;
+				}
+
 				if (playerData.hasEffects) {
-					int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
-
-					if (regenerationDuration > duration) {
-						regenerationDuration = duration;
-					}
-
 					player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
 
 					player.sendMessage("This dream world suddenly feels very cold.");
 				} else {
-					int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
-
-					if (regenerationDuration > duration) {
-						regenerationDuration = duration;
-					}
-
 					player.addPotionEffects(Arrays.asList(new PotionEffect[]{
 						new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 						new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),
