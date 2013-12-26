@@ -56,8 +56,6 @@ public class Listeners implements Listener {
 				player.removePotionEffect(PotionEffectType.INVISIBILITY);
 				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-				player.removePotionEffect(PotionEffectType.REGENERATION);
-
 				player.sendMessage("As you wake, you come to the grave realization that this was not a dream.");
 			}
 
@@ -236,15 +234,11 @@ public class Listeners implements Listener {
 			// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
 			int duration = 24260 - (int) player.getWorld().getTime();
 
+			// Calculate custom duration for regeneration effect.
+			int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
+
 			// 24260 - 12541 (the first moment a bed can be used).
 			if (duration <= 11719) {
-				// Calculate custom duration for regeneration effect.
-				int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
-
-				if (regenerationDuration > duration) {
-					regenerationDuration = duration;
-				}
-
 				playerData.nextWarning = player.getWorld().getFullTime() + regenerationDuration;
 
 				if (playerData.hasEffects) {
@@ -279,6 +273,8 @@ public class Listeners implements Listener {
 					}
 				}
 			} else {
+				player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
+
 				removeEffects();
 			}
 
