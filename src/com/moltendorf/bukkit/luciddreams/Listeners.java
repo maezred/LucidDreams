@@ -7,9 +7,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -77,11 +81,61 @@ public class Listeners implements Listener {
 
 		final Entity damager = event.getDamager();
 
-		if (damager == null || damager.getType() != EntityType.PLAYER) {
+		if (damager == null) {
 			return;
 		}
 
-		final UUID id = damager.getUniqueId();
+		final Player player;
+
+		final EntityType type = damager.getType();
+
+		final LivingEntity shooter;
+
+		switch (type) {
+			case ARROW:
+				shooter = ((Arrow) damager).getShooter();
+
+				if (shooter!= null && shooter.getType() == EntityType.PLAYER) {
+					player = (Player) shooter;
+				} else {
+					return;
+				}
+
+			break;
+
+			case PLAYER:
+				// Convert Entity to Player.
+				player = (Player) damager;
+
+			break;
+
+			case SPLASH_POTION:
+				shooter = ((ThrownPotion) damager).getShooter();
+
+				if (shooter!= null && shooter.getType() == EntityType.PLAYER) {
+					player = (Player) shooter;
+				} else {
+					return;
+				}
+
+			break;
+
+			case PRIMED_TNT:
+				final Entity source = ((TNTPrimed) damager).getSource();
+
+				if (source != null && source.getType() == EntityType.PLAYER) {
+					player = (Player) source;
+				} else {
+					return;
+				}
+
+			break;
+
+			default:
+				return;
+		}
+
+		final UUID id = player.getUniqueId();
 
 		final PlayerData playerData = players.get(id);
 
@@ -94,10 +148,7 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		long currentWarning = damager.getWorld().getFullTime();
-
-		// Convert Entity to Player.
-		final Player player = (Player) damager;
+		long currentWarning = player.getWorld().getFullTime();
 
 		if (currentWarning > playerData.nextWarning) {
 			// Negate all damage dealt to the entity.
