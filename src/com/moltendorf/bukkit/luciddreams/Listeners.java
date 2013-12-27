@@ -1,7 +1,7 @@
 package com.moltendorf.bukkit.luciddreams;
 
 import java.util.Arrays;
-import java.util.Collection;
+//import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,15 +19,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+//import org.bukkit.event.player.PlayerLoginEvent;
+//import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -387,32 +384,32 @@ public class Listeners implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void PlayerQuitEventMonitor(PlayerQuitEvent event) {
-		if (true) {
-			return;
-		}
-
-		// Are we enabled at all?
-		if (!plugin.configuration.global.enabled) {
-			return;
-		}
-
-		final Player player = event.getPlayer();
-		final UUID id = player.getUniqueId();
-
-		final PlayerData playerData = players.get(id);
-
-		if (playerData == null) {
-			return;
-		}
-
-		Collection<PotionEffect> potions = player.getActivePotionEffects();
-
-		for (PotionEffect effect : potions) {
-
-		}
-	}
+//	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+//	public void PlayerQuitEventMonitor(PlayerQuitEvent event) {
+//		if (true) {
+//			return;
+//		}
+//
+//		// Are we enabled at all?
+//		if (!plugin.configuration.global.enabled) {
+//			return;
+//		}
+//
+//		final Player player = event.getPlayer();
+//		final UUID id = player.getUniqueId();
+//
+//		final PlayerData playerData = players.get(id);
+//
+//		if (playerData == null) {
+//			return;
+//		}
+//
+//		Collection<PotionEffect> potions = player.getActivePotionEffects();
+//
+//		for (PotionEffect effect : potions) {
+//
+//		}
+//	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void PlayerRespawnEventMonitor(PlayerRespawnEvent event) {
@@ -434,24 +431,24 @@ public class Listeners implements Listener {
 		players.remove(id);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void PlayerLoginEventMonitor(PlayerLoginEvent event) {
-		if (true) {
-			return;
-		}
-
-		// Are we enabled at all?
-		if (!plugin.configuration.global.enabled) {
-			return;
-		}
-
-		final Player player = event.getPlayer();
-		final UUID id = player.getUniqueId();
-
-		final PlayerData playerData = players.get(id);
-
-		if (playerData == null) {
-			return;
-		}
-	}
+//	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+//	public void PlayerLoginEventMonitor(PlayerLoginEvent event) {
+//		if (true) {
+//			return;
+//		}
+//
+//		// Are we enabled at all?
+//		if (!plugin.configuration.global.enabled) {
+//			return;
+//		}
+//
+//		final Player player = event.getPlayer();
+//		final UUID id = player.getUniqueId();
+//
+//		final PlayerData playerData = players.get(id);
+//
+//		if (playerData == null) {
+//			return;
+//		}
+//	}
 }
