@@ -416,7 +416,7 @@ public class Listeners implements Listener {
 							}
 						};
 
-						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 24260 - world.getTime());
+						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 24160 - world.getTime());
 					}
 				}
 			} else {
