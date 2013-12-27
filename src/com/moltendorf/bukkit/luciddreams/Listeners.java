@@ -135,10 +135,11 @@ public class Listeners implements Listener {
 				return;
 		}
 
+		final Entity entity = event.getEntity();
 		final UUID id = player.getUniqueId();
 
 		// No cancelling shooting yourself in the foot.
-		if (event.getEntity().getUniqueId() == id) {
+		if (entity.getUniqueId() == id) {
 			return;
 		}
 
@@ -148,9 +149,30 @@ public class Listeners implements Listener {
 			return;
 		}
 
+		EntityType targetType = event.getEntityType();
+
 		// Is this entity allowed to be attacked?
-		if (!plugin.configuration.global.disallowed.contains(event.getEntityType())) {
+		if (!plugin.configuration.global.disallowed.contains(targetType)) {
 			return;
+		}
+
+		if (plugin.configuration.global.creatures.contains(targetType)) {
+			final Creature creature = (Creature) entity;
+
+			if (creature.getTarget().getUniqueId() == id) {
+				// Negate all damage dealt to the entity.
+				event.setDamage(0);
+
+				// Clear this creature's target.
+				creature.setTarget(null);
+
+				// Regenerate the player to full in case they took any damage.
+				player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.), 1, true));
+
+				player.sendMessage("You've frightened this monster.");
+
+				return;
+			}
 		}
 
 		long currentWarning = player.getWorld().getFullTime();
