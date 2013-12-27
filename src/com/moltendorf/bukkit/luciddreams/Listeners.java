@@ -179,8 +179,9 @@ public class Listeners implements Listener {
 
 		if (plugin.configuration.global.creatures.contains(targetType)) {
 			final Creature creature = (Creature) entity;
+			final Entity target = creature.getTarget();
 
-			if (creature.getTarget().getUniqueId() == id) {
+			if (target != null && target.getUniqueId() == id) {
 				// Negate all damage dealt to the entity.
 				event.setDamage(0);
 
