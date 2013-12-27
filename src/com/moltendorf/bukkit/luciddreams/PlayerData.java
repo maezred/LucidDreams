@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitTask;
  * @author moltendorf
  */
 public class PlayerData {
-	final public Player player;
+	public Player player;
 
 	public double nextWarning = 0;
 

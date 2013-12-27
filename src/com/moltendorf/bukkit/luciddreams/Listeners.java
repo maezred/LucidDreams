@@ -26,7 +26,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-//import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -55,7 +55,7 @@ public class Listeners implements Listener {
 			PlayerData playerData = entry.getValue();
 			Player player = playerData.player;
 
-			if (playerData.hasEffects) {
+			if (player != null && playerData.hasEffects) {
 				player.removePotionEffect(PotionEffectType.INVISIBILITY);
 				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
@@ -83,7 +83,7 @@ public class Listeners implements Listener {
 			PlayerData playerData = entry.getValue();
 			Player player = playerData.player;
 
-			if (playerData.hasEffects) {
+			if (player != null && playerData.hasEffects) {
 				player.removePotionEffect(PotionEffectType.INVISIBILITY);
 				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
@@ -461,32 +461,33 @@ public class Listeners implements Listener {
 		}
 	}
 
-//	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-//	public void PlayerQuitEventMonitor(PlayerQuitEvent event) {
-//		if (true) {
-//			return;
-//		}
-//
-//		// Are we enabled at all?
-//		if (!plugin.configuration.global.enabled) {
-//			return;
-//		}
-//
-//		final Player player = event.getPlayer();
-//		final UUID id = player.getUniqueId();
-//
-//		final PlayerData playerData = players.get(id);
-//
-//		if (playerData == null) {
-//			return;
-//		}
-//
-//		Collection<PotionEffect> potions = player.getActivePotionEffects();
-//
-//		for (PotionEffect effect : potions) {
-//
-//		}
-//	}
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void PlayerQuitEventMonitor(PlayerQuitEvent event) {
+
+		// Are we enabled at all?
+		if (!plugin.configuration.global.enabled) {
+			return;
+		}
+
+		final Player player = event.getPlayer();
+		final UUID id = player.getUniqueId();
+
+		final PlayerData playerData = players.get(id);
+
+		if (playerData == null) {
+			return;
+		}
+
+		playerData.player = null;
+
+		if (!playerData.hasEffects) {
+			return;
+		}
+
+		// Remove effects.
+		player.removePotionEffect(PotionEffectType.INVISIBILITY);
+		player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void PlayerRespawnEventMonitor(PlayerRespawnEvent event) {
@@ -521,7 +522,13 @@ public class Listeners implements Listener {
 
 		final PlayerData playerData = players.get(id);
 
-		if (playerData == null || !playerData.hasEffects) {
+		if (playerData == null) {
+			return;
+		}
+
+		playerData.player = player;
+
+		if (!playerData.hasEffects) {
 			return;
 		}
 
