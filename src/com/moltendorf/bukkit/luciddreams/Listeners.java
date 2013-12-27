@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -182,9 +183,9 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		final Creature creature = (Creature) entity;
-
 		if (plugin.configuration.global.creatures.contains(targetType)) {
+			final Creature creature = (Creature) entity;
+
 			final Entity target = creature.getTarget();
 
 			if (target != null && target.getUniqueId() == id) {
@@ -209,7 +210,7 @@ public class Listeners implements Listener {
 		if (currentWarning > playerData.nextWarning) {
 			// Negate all damage dealt to the entity.
 			event.setCancelled(true);
-			creature.damage(0);
+			((Damageable) entity).damage(0);
 
 			final double health = player.getHealth();
 
