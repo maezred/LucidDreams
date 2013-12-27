@@ -54,6 +54,9 @@ public class Listeners implements Listener {
 			Player player = playerData.player;
 
 			if (playerData.hasEffects) {
+				player.removePotionEffect(PotionEffectType.INVISIBILITY);
+				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
 				player.addPotionEffects(Arrays.asList(new PotionEffect[]{
 					new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 					new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
