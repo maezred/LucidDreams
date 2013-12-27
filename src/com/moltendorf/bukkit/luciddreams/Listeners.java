@@ -1,7 +1,6 @@
 package com.moltendorf.bukkit.luciddreams;
 
 import java.util.Arrays;
-//import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
