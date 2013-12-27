@@ -24,7 +24,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-//import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 //import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
@@ -41,6 +41,8 @@ public class Listeners implements Listener {
 	final protected Plugin plugin;
 
 	protected BukkitTask clock = null;
+	protected World world = null;
+
 	protected Map<UUID, PlayerData> players = new LinkedHashMap<>();
 
 	protected Listeners(final Plugin instance) {
@@ -287,6 +289,10 @@ public class Listeners implements Listener {
 		if (fetchedPlayerData == null) {
 			playerData = new PlayerData(player);
 			players.put(id, playerData);
+
+			if (world != null) {
+				world = player.getWorld();
+			}
 		} else {
 			playerData = fetchedPlayerData;
 
@@ -339,8 +345,6 @@ public class Listeners implements Listener {
 		}
 
 		if (playerData.readyForEffects) {
-			final World world = player.getWorld();
-
 			// 23458 (the last moment a bed can be used).
 			// 23660 (the moment zombies and skeletons begin burning).
 			// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
@@ -503,24 +507,42 @@ public class Listeners implements Listener {
 		players.remove(id);
 	}
 
-//	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-//	public void PlayerLoginEventMonitor(PlayerLoginEvent event) {
-//		if (true) {
-//			return;
-//		}
-//
-//		// Are we enabled at all?
-//		if (!plugin.configuration.global.enabled) {
-//			return;
-//		}
-//
-//		final Player player = event.getPlayer();
-//		final UUID id = player.getUniqueId();
-//
-//		final PlayerData playerData = players.get(id);
-//
-//		if (playerData == null) {
-//			return;
-//		}
-//	}
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void PlayerLoginEventMonitor(PlayerLoginEvent event) {
+
+		// Are we enabled at all?
+		if (!plugin.configuration.global.enabled) {
+			return;
+		}
+
+		final Player player = event.getPlayer();
+		final UUID id = player.getUniqueId();
+
+		final PlayerData playerData = players.get(id);
+
+		if (playerData == null || !playerData.hasEffects) {
+			return;
+		}
+
+		int time = (int) world.getTime();
+
+		// We need to fix the durations.
+		player.removePotionEffect(PotionEffectType.INVISIBILITY);
+		player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+		int duration;
+
+		if (time < 260 || time > 12541) {
+			duration = 24260 - time;
+		} else if (world.hasStorm()) {
+			duration = world.getWeatherDuration();
+		} else {
+			return;
+		}
+
+		player.addPotionEffects(Arrays.asList(new PotionEffect[]{
+			new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
+			new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
+		}));
+	}
 }
