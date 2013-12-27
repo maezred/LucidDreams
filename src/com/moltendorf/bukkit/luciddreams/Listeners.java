@@ -167,7 +167,7 @@ public class Listeners implements Listener {
 				// Give the player a nice warning.
 				player.damage(health / 2.);
 
-				regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
+				regenerationDuration = (int) ((health - player.getHealth()) * 1.25 * 20.);
 
 				// Regenerate them back up because we're nice.
 				player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
