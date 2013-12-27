@@ -20,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -177,13 +178,15 @@ public class Listeners implements Listener {
 			return;
 		}
 
+		final Creature creature = (Creature) entity;
+
 		if (plugin.configuration.global.creatures.contains(targetType)) {
-			final Creature creature = (Creature) entity;
 			final Entity target = creature.getTarget();
 
 			if (target != null && target.getUniqueId() == id) {
 				// Negate all damage dealt to the entity.
-				event.setDamage(0);
+				event.setCancelled(true);
+				creature.damage(0);
 
 				// Clear this creature's target.
 				creature.setTarget(null);
@@ -201,7 +204,8 @@ public class Listeners implements Listener {
 
 		if (currentWarning > playerData.nextWarning) {
 			// Negate all damage dealt to the entity.
-			event.setDamage(0);
+			event.setCancelled(true);
+			creature.damage(0);
 
 			final double health = player.getHealth();
 
@@ -238,7 +242,7 @@ public class Listeners implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void EntityTargetLivingEntityEventHandler(final EntityTargetLivingEntityEvent event) {
+	public void EntityTargetEventHandler(final EntityTargetEvent event) {
 
 		// Are we enabled at all?
 		if (!plugin.configuration.global.enabled) {
