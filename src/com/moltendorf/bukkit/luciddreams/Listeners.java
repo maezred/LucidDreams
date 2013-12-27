@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -308,6 +309,20 @@ public class Listeners implements Listener {
 
 					player.sendMessage("This dream world suddenly feels very cold.");
 				} else {
+					Creature creature;
+					Entity target;
+
+					for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
+						if (plugin.configuration.global.creatures.contains(entity.getType())) {
+							creature = (Creature) entity;
+							target = creature.getTarget();
+
+							if (target != null && target.getUniqueId() == id) {
+								creature.setTarget(null);
+							}
+						}
+					}
+
 					player.addPotionEffects(Arrays.asList(new PotionEffect[]{
 						new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 						new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),

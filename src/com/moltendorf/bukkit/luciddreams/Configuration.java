@@ -37,6 +37,23 @@ public class Configuration {
 			EntityType.WOLF,
 			EntityType.ZOMBIE
 		}));
+
+		final protected HashSet creatures = new HashSet(Arrays.asList(new EntityType[]{
+			EntityType.BLAZE,
+			EntityType.CAVE_SPIDER,
+			EntityType.CREEPER,
+			EntityType.ENDERMAN,
+			EntityType.GIANT,
+			EntityType.IRON_GOLEM,
+			EntityType.PIG_ZOMBIE,
+			EntityType.SILVERFISH,
+			EntityType.SKELETON,
+			EntityType.SPIDER,
+			EntityType.WITCH,
+			EntityType.WITHER,
+			EntityType.WOLF,
+			EntityType.ZOMBIE
+		}));
 	}
 
 	// Final data.
