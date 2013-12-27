@@ -290,7 +290,7 @@ public class Listeners implements Listener {
 			playerData = new PlayerData(player);
 			players.put(id, playerData);
 
-			if (world != null) {
+			if (world == null) {
 				world = player.getWorld();
 			}
 		} else {
