@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
@@ -44,6 +45,26 @@ public class Listeners implements Listener {
 
 	protected Listeners(final Plugin instance) {
 		plugin = instance;
+	}
+
+	protected void extendEffects(int duration) {
+		for (Entry<UUID, PlayerData> entry : players.entrySet()) {
+			PlayerData playerData = entry.getValue();
+			Player player = playerData.player;
+
+			if (playerData.hasEffects) {
+				player.addPotionEffects(Arrays.asList(new PotionEffect[]{
+					new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
+					new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
+				}));
+
+				player.sendMessage("You continue dreaming as the rain keeps pouring.");
+			}
+
+			if (playerData.taskFlagForEffects != null) {
+				playerData.taskFlagForEffects.cancel();
+			}
+		}
 	}
 
 	protected void removeEffects() {
@@ -311,17 +332,19 @@ public class Listeners implements Listener {
 		}
 
 		if (playerData.readyForEffects) {
+			final World world = player.getWorld();
+
 			// 23458 (the last moment a bed can be used).
 			// 23660 (the moment zombies and skeletons begin burning).
 			// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
-			int duration = 24260 - (int) player.getWorld().getTime();
+			int duration = 24260 - (int) world.getTime();
 
 			// Calculate custom duration for regeneration effect.
 			int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
 
 			// 24260 - 12541 (the first moment a bed can be used).
 			if (duration <= 11719) {
-				playerData.nextWarning = player.getWorld().getFullTime() + regenerationDuration;
+				playerData.nextWarning = world.getFullTime() + regenerationDuration;
 
 				if (playerData.hasEffects) {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
@@ -359,13 +382,33 @@ public class Listeners implements Listener {
 
 							@Override
 							public void run() {
-								clock = null;
+								if (world.hasStorm()) {
+									int ticks = world.getWeatherDuration();
 
-								removeEffects();
+									extendEffects(ticks);
+
+									final Runnable runnable;
+
+									runnable = new Runnable() {
+
+										@Override
+										public void run() {
+											clock = null;
+
+											removeEffects();
+										}
+									};
+
+									clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, ticks);
+								} else {
+									clock = null;
+
+									removeEffects();
+								}
 							}
 						};
 
-						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 24260 - player.getWorld().getTime());
+						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 24260 - world.getTime());
 					}
 				}
 			} else {
