@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -195,7 +196,7 @@ public class Listeners implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void EntityTargetEventHandler(final EntityTargetEvent event) {
+	public void EntityTargetLivingEntityEventHandler(final EntityTargetLivingEntityEvent event) {
 
 		// Are we enabled at all?
 		if (!plugin.configuration.global.enabled) {
