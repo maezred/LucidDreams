@@ -24,7 +24,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 //import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
@@ -508,7 +508,7 @@ public class Listeners implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void PlayerLoginEventMonitor(PlayerLoginEvent event) {
+	public void PlayerJoinEventMonitor(PlayerJoinEvent event) {
 
 		// Are we enabled at all?
 		if (!plugin.configuration.global.enabled) {
