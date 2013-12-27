@@ -395,7 +395,7 @@ public class Listeners implements Listener {
 							@Override
 							public void run() {
 								if (world.hasStorm()) {
-									int ticks = world.getWeatherDuration();
+									int ticks = world.getWeatherDuration() + 600;
 
 									extendEffects(ticks);
 
@@ -543,7 +543,7 @@ public class Listeners implements Listener {
 		if (time < 260 || time > 12541) {
 			duration = 24260 - time;
 		} else if (world.hasStorm()) {
-			duration = world.getWeatherDuration();
+			duration = world.getWeatherDuration() + 600;
 		} else {
 			return;
 		}
