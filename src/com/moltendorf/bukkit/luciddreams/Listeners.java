@@ -209,30 +209,14 @@ public class Listeners implements Listener {
 		if (currentWarning > playerData.nextWarning) {
 			// Negate all damage dealt to the entity.
 			event.setCancelled(true);
-			((Damageable) entity).damage(0);
 
-			final double health = player.getHealth();
+            player.addPotionEffects(Arrays.asList(new PotionEffect[]{
+                new PotionEffect(PotionEffectType.BLINDNESS, 40, 0),
+                new PotionEffect(PotionEffectType.SLOW, 40, 6)
+            }));
 
-			int regenerationDuration = 0;
-
-			if (health > 1) {
-				// Give the player a nice warning.
-				player.damage(health / 2.);
-
-				regenerationDuration = (int) ((health - player.getHealth()) * 1.25 * 20.);
-
-				// Regenerate them back up because we're nice.
-				player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
-			} else {
-				player.damage(0);
-			}
-
-			// The warning period lasts for five seconds or the full duration of the regeneration. Whichever is more.
-			if (regenerationDuration > 100) {
-				playerData.nextWarning = currentWarning + regenerationDuration;
-			} else {
-				playerData.nextWarning = currentWarning + 100;
-			}
+			// The warning period lasts for two seconds.
+			playerData.nextWarning = currentWarning + 40;
 
 			player.sendMessage("You panic from the thought of the monsters.");
 		} else {
