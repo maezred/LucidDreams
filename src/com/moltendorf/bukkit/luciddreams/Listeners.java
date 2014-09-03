@@ -403,7 +403,8 @@ public class Listeners implements Listener {
 							}
 						};
 
-						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 24160 - world.getTime());
+                        // Run the task 12 seconds before the effects run out to prevent screen flashing.
+						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, duration - 240);
 					}
 				}
 			} else {
