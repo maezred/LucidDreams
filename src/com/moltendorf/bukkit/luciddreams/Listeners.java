@@ -334,11 +334,19 @@ public class Listeners implements Listener {
 			// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
 			int duration = 24260 - (int) world.getTime();
 
+            // 24260 - 12541 (the first moment a bed can be used).
+            if (duration > 11719) {
+                if (world.hasStorm()) {
+                    duration = world.getWeatherDuration() + 600;
+                }
+            } else {
+                duration = 0;
+            }
+
 			// Calculate custom duration for regeneration effect.
 			int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
 
-			// 24260 - 12541 (the first moment a bed can be used).
-			if (duration <= 11719) {
+			if (duration > 0) {
 				playerData.nextWarning = world.getFullTime() + regenerationDuration;
 
 				if (playerData.hasEffects) {
