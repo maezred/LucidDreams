@@ -1,35 +1,23 @@
 package com.moltendorf.bukkit.luciddreams;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerBedLeaveEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
 
 /**
  * Listener register.
@@ -328,105 +316,114 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		if (playerData.readyForEffects) {
-			// 23458 (the last moment a bed can be used).
-			// 23660 (the moment zombies and skeletons begin burning).
-			// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
-			int duration = 24260 - (int) world.getTime();
+		final Runnable runnable;
 
-            // 24260 - 12541 (the first moment a bed can be used).
-            if (duration > 11719) {
-                if (world.hasStorm()) {
-                    duration = world.getWeatherDuration() + 600;
-                }
-            } else {
-                duration = 0;
-            }
+		runnable = new Runnable() {
 
-			// Calculate custom duration for regeneration effect.
-			int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
+			@Override
+			public void run() {
+				if (playerData.readyForEffects) {
+					// 23458 (the last moment a bed can be used).
+					// 23660 (the moment zombies and skeletons begin burning).
+					// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
+					int duration = 24260 - (int) world.getTime();
 
-			if (duration > 0) {
-				playerData.nextWarning = world.getFullTime() + regenerationDuration;
-
-				if (playerData.hasEffects) {
-					player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
-
-					player.sendMessage("This dream world suddenly feels very cold.");
-				} else {
-					Creature creature;
-					Entity target;
-
-					for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
-						if (plugin.configuration.global.creatures.contains(entity.getType())) {
-							creature = (Creature) entity;
-							target = creature.getTarget();
-
-							if (target != null && target.getUniqueId() == id) {
-								creature.setTarget(null);
-							}
+					// 24260 - 12541 (the first moment a bed can be used).
+					if (duration > 11719) {
+						if (world.hasStorm()) {
+							duration = world.getWeatherDuration() + 600;
+						} else {
+							duration = 0;
 						}
 					}
 
-					player.addPotionEffects(Arrays.asList(new PotionEffect[]{
-						new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
-						new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),
-						new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true)
-					}));
+					// Calculate custom duration for regeneration effect.
+					int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
 
-					player.sendMessage("You feel as if you're dreaming.");
+					if (duration > 0) {
+						playerData.nextWarning = world.getFullTime() + regenerationDuration;
 
-					playerData.hasEffects = true;
+						if (playerData.hasEffects) {
+							player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
 
-					if (clock == null) {
-						final Runnable runnable;
+							player.sendMessage("This dream world suddenly feels very cold.");
+						} else {
+							Creature creature;
+							Entity target;
 
-						runnable = new Runnable() {
+							for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
+								if (plugin.configuration.global.creatures.contains(entity.getType())) {
+									creature = (Creature) entity;
+									target = creature.getTarget();
 
-							@Override
-							public void run() {
-								if (world.hasStorm()) {
-									int ticks = world.getWeatherDuration() + 600;
+									if (target != null && target.getUniqueId() == id) {
+										creature.setTarget(null);
+									}
+								}
+							}
 
-									extendEffects(ticks);
+							player.addPotionEffects(Arrays.asList(new PotionEffect[]{
+								new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
+								new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),
+								new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true)
+							}));
 
-									final Runnable runnable;
+							player.sendMessage("You feel as if you're dreaming.");
 
-									runnable = new Runnable() {
+							playerData.hasEffects = true;
 
-										@Override
-										public void run() {
+							if (clock == null) {
+								final Runnable runnable;
+
+								runnable = new Runnable() {
+
+									@Override
+									public void run() {
+										if (world.hasStorm()) {
+											int ticks = world.getWeatherDuration() + 600;
+
+											extendEffects(ticks);
+
+											final Runnable runnable;
+
+											runnable = new Runnable() {
+
+												@Override
+												public void run() {
+													clock = null;
+
+													removeEffects();
+												}
+											};
+
+											clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, ticks);
+										} else {
 											clock = null;
 
 											removeEffects();
 										}
-									};
+									}
+								};
 
-									clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, ticks);
-								} else {
-									clock = null;
-
-									removeEffects();
-								}
+								// Run the task 12 seconds before the effects run out to prevent screen flashing.
+								clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, duration - 240);
 							}
-						};
+						}
+					} else {
+						player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
 
-                        // Run the task 12 seconds before the effects run out to prevent screen flashing.
-						clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, duration - 240);
+						removeEffects();
 					}
+
+					playerData.readyForEffects = false;
+				} else if (playerData.taskFlagForEffects != null) {
+					playerData.taskFlagForEffects.cancel();
+					playerData.taskFlagForEffects = null;
 				}
-			} else {
-				player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
-
-				removeEffects();
 			}
+		};
 
-			playerData.readyForEffects = false;
-		} else if (playerData.taskFlagForEffects != null) {
-			playerData.taskFlagForEffects.cancel();
-			playerData.taskFlagForEffects = null;
-		}
-
+		plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 0);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
