@@ -200,7 +200,7 @@ public class Listeners implements Listener {
 
             player.addPotionEffects(Arrays.asList(new PotionEffect[]{
                 new PotionEffect(PotionEffectType.BLINDNESS, 40, 0),
-                new PotionEffect(PotionEffectType.SLOW, 40, 6)
+                new PotionEffect(PotionEffectType.SLOW, 20, 5)
             }));
 
 			// The warning period lasts for two seconds.
