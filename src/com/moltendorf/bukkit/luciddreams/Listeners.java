@@ -46,10 +46,10 @@ public class Listeners implements Listener {
 				player.removePotionEffect(PotionEffectType.INVISIBILITY);
 				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-				player.addPotionEffects(Arrays.asList(new PotionEffect[]{
+				player.addPotionEffects(Arrays.asList(
 					new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 					new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
-				}));
+				));
 
 				player.sendMessage("You continue dreaming as the rain keeps pouring.");
 			}
@@ -198,10 +198,10 @@ public class Listeners implements Listener {
 			// Negate all damage dealt to the entity.
 			event.setCancelled(true);
 
-            player.addPotionEffects(Arrays.asList(new PotionEffect[]{
+            player.addPotionEffects(Arrays.asList(
                 new PotionEffect(PotionEffectType.BLINDNESS, 40, 0),
                 new PotionEffect(PotionEffectType.SLOW, 20, 5)
-            }));
+            ));
 
 			// The warning period lasts for two seconds.
 			playerData.nextWarning = currentWarning + 40;
@@ -362,11 +362,11 @@ public class Listeners implements Listener {
 								}
 							}
 
-							player.addPotionEffects(Arrays.asList(new PotionEffect[]{
+							player.addPotionEffects(Arrays.asList(
 								new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 								new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),
 								new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true)
-							}));
+							));
 
 							player.sendMessage("You feel as if you're dreaming.");
 
@@ -537,9 +537,9 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		player.addPotionEffects(Arrays.asList(new PotionEffect[]{
+		player.addPotionEffects(Arrays.asList(
 			new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 			new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
-		}));
+		));
 	}
 }

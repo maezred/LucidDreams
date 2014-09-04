@@ -16,7 +16,7 @@ public class Configuration {
 		// Final data.
 		final protected boolean enabled = true; // Whether or not the plugin is enabled at all; useful for using it as an interface (default is true).
 
-		final protected HashSet disallowed = new HashSet(Arrays.asList(new EntityType[]{
+		final protected HashSet<EntityType> disallowed = new HashSet<>(Arrays.asList(
 			EntityType.BLAZE,
 			EntityType.CAVE_SPIDER,
 			EntityType.CREEPER,
@@ -36,9 +36,9 @@ public class Configuration {
 			EntityType.WITHER,
 			EntityType.WOLF,
 			EntityType.ZOMBIE
-		}));
+		));
 
-		final protected HashSet creatures = new HashSet(Arrays.asList(new EntityType[]{
+		final protected HashSet<EntityType> creatures = new HashSet<>(Arrays.asList(
 			EntityType.BLAZE,
 			EntityType.CAVE_SPIDER,
 			EntityType.CREEPER,
@@ -53,7 +53,7 @@ public class Configuration {
 			EntityType.WITHER,
 			EntityType.WOLF,
 			EntityType.ZOMBIE
-		}));
+		));
 	}
 
 	// Final data.
