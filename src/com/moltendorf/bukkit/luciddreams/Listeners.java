@@ -553,6 +553,7 @@ public class Listeners implements Listener {
 			return;
 		}
 
+		// We only use the input block to figure out which block is the head and the foot of the bed.
 		final Block block = event.getBlock();
 
 		if (block == null || block.getType() != Material.BED_BLOCK) {
@@ -617,6 +618,7 @@ public class Listeners implements Listener {
 			return;
 		}
 
+		// No variables defined above are used beyond this point.
 		final Location headLocation = head.getLocation();
 		final Location footLocation = foot.getLocation();
 
@@ -632,6 +634,7 @@ public class Listeners implements Listener {
 			BlockFace.NORTH_WEST
 		};
 
+		// Iterate all players to see if any of them used this bed to start their dream.
 		for (Entry<UUID, PlayerData> entry : players.entrySet()) {
 			PlayerData playerData = entry.getValue();
 			Player player = playerData.player;
@@ -642,10 +645,12 @@ public class Listeners implements Listener {
 				if (spawnLocation != null) {
 					final Block spawnBlock = spawnLocation.getBlock();
 
+					// Iterate all sides of the spawn location for a bed.
 					for (BlockFace face : faces) {
 						final Block checkBlock = spawnBlock.getRelative(face);
 						final Location checkLocation = checkBlock.getLocation();
 
+						// Check if this location is the bed that was broken.
 						if (footLocation.equals(checkLocation) || headLocation.equals(checkLocation)) {
 							player.removePotionEffect(PotionEffectType.INVISIBILITY);
 							player.removePotionEffect(PotionEffectType.NIGHT_VISION);
