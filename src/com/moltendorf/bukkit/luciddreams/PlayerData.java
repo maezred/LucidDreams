@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
- *
  * @author moltendorf
  */
 public class PlayerData {

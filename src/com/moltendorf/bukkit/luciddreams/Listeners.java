@@ -114,30 +114,30 @@ public class Listeners implements Listener {
 			case ARROW:
 				shooter = ((Arrow) damager).getShooter();
 
-				if (shooter!= null && shooter.getType() == EntityType.PLAYER) {
+				if (shooter != null && shooter.getType() == EntityType.PLAYER) {
 					player = (Player) shooter;
 				} else {
 					return;
 				}
 
-			break;
+				break;
 
 			case PLAYER:
 				// Convert Entity to Player.
 				player = (Player) damager;
 
-			break;
+				break;
 
 			case SPLASH_POTION:
 				shooter = ((ThrownPotion) damager).getShooter();
 
-				if (shooter!= null && shooter.getType() == EntityType.PLAYER) {
+				if (shooter != null && shooter.getType() == EntityType.PLAYER) {
 					player = (Player) shooter;
 				} else {
 					return;
 				}
 
-			break;
+				break;
 
 			case PRIMED_TNT:
 				final Entity source = ((TNTPrimed) damager).getSource();
@@ -148,7 +148,7 @@ public class Listeners implements Listener {
 					return;
 				}
 
-			break;
+				break;
 
 			default:
 				return;
@@ -203,7 +203,7 @@ public class Listeners implements Listener {
 			// Negate all damage dealt to the entity.
 			event.setCancelled(true);
 
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 
 			// The warning period lasts for two seconds.
 			playerData.nextWarning = currentWarning + 40;
@@ -620,7 +620,7 @@ public class Listeners implements Listener {
 		final Location headLocation = head.getLocation();
 		final Location footLocation = foot.getLocation();
 
-		final BlockFace[] faces = new BlockFace[] {
+		final BlockFace[] faces = new BlockFace[]{
 			BlockFace.SELF,
 			BlockFace.NORTH,
 			BlockFace.NORTH_EAST,

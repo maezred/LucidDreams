@@ -1,8 +1,9 @@
 package com.moltendorf.bukkit.luciddreams;
 
+import org.bukkit.entity.EntityType;
+
 import java.util.Arrays;
 import java.util.HashSet;
-import org.bukkit.entity.EntityType;
 
 /**
  * Configuration class.
