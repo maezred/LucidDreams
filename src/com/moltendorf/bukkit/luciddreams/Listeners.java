@@ -1,14 +1,19 @@
 package com.moltendorf.bukkit.luciddreams;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.material.Bed;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -538,5 +543,139 @@ public class Listeners implements Listener {
 			new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 			new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
 		));
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void BlockBreakEventMonitor(BlockBreakEvent event) {
+
+		// Are we enabled at all?
+		if (!plugin.configuration.global.enabled) {
+			return;
+		}
+
+		final Player player = event.getPlayer();
+
+		if (player == null) {
+			return;
+		}
+
+		final UUID id = player.getUniqueId();
+
+		final PlayerData playerData = players.get(id);
+
+		if (playerData == null || !playerData.hasEffects) {
+			return;
+		}
+
+		final Block block = event.getBlock();
+
+		if (block == null || block.getType() != Material.BED_BLOCK) {
+			return;
+		}
+
+		final Location spawnLocation = player.getBedSpawnLocation();
+
+		if (spawnLocation == null) {
+			return;
+		}
+
+		final Location blockLocation = block.getLocation();
+		final Bed blockData = (Bed) block.getState().getData();
+
+		final Block head, foot;
+
+		if (blockData.isHeadOfBed()) {
+			head = block;
+
+			switch (blockData.getFacing()) {
+				case NORTH:
+					foot = blockLocation.add(0, 0, 1).getBlock();
+					break;
+
+				case EAST:
+					foot = blockLocation.add(-1, 0, 0).getBlock();
+					break;
+
+				case SOUTH:
+					foot = blockLocation.add(0, 0, -1).getBlock();
+					break;
+
+				case WEST:
+					foot = blockLocation.add(1, 0, 0).getBlock();
+					break;
+
+				default:
+					return;
+			}
+		} else {
+			foot = block;
+
+			switch (blockData.getFacing()) {
+				case NORTH:
+					head = blockLocation.add(0, 0, -1).getBlock();
+					break;
+
+				case EAST:
+					head = blockLocation.add(1, 0, 0).getBlock();
+					break;
+
+				case SOUTH:
+					head = blockLocation.add(0, 0, 1).getBlock();
+					break;
+
+				case WEST:
+					head = blockLocation.add(-1, 0, 0).getBlock();
+					break;
+
+				default:
+					return;
+			}
+		}
+
+		// Very unlikely.
+		if (head.getType() != Material.BED_BLOCK) {
+			return;
+		}
+
+		System.out.println("BlockBreakEventMonitor");
+
+		final Location headLocation = head.getLocation();
+		final Location footLocation = foot.getLocation();
+
+		final BlockFace[] faces = new BlockFace[] {
+			BlockFace.SELF,
+			BlockFace.NORTH,
+			BlockFace.NORTH_EAST,
+			BlockFace.EAST,
+			BlockFace.SOUTH_EAST,
+			BlockFace.SOUTH,
+			BlockFace.SOUTH_WEST,
+			BlockFace.WEST,
+			BlockFace.NORTH_WEST
+		};
+
+		System.out.println("Spawn: " + spawnLocation);
+		System.out.println("Head: " + headLocation);
+		System.out.println("Foot: " + footLocation);
+
+		final Block spawnBlock = spawnLocation.getBlock();
+
+		for (BlockFace face : faces) {
+			final Block checkBlock = spawnBlock.getRelative(face);
+			final Location checkLocation = checkBlock.getLocation();
+
+			System.out.println("Check " + face + ": " + checkLocation);
+
+			if (footLocation.equals(checkLocation) || headLocation.equals(checkLocation)) {
+				System.out.println("BlockBreakEventMonitor2");
+
+				player.removePotionEffect(PotionEffectType.INVISIBILITY);
+				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+				players.remove(id);
+
+				player.sendMessage("You jolt awake as soon as you fall out of bed.");
+			}
+		}
 	}
 }
