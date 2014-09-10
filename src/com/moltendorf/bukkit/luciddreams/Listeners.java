@@ -632,8 +632,6 @@ public class Listeners implements Listener {
 			BlockFace.NORTH_WEST
 		};
 
-		System.out.println("BlockBreakEventMonitor");
-
 		for (Entry<UUID, PlayerData> entry : players.entrySet()) {
 			PlayerData playerData = entry.getValue();
 			Player player = playerData.player;
@@ -648,11 +646,7 @@ public class Listeners implements Listener {
 						final Block checkBlock = spawnBlock.getRelative(face);
 						final Location checkLocation = checkBlock.getLocation();
 
-						System.out.println("Check " + face + ": " + checkLocation);
-
 						if (footLocation.equals(checkLocation) || headLocation.equals(checkLocation)) {
-							System.out.println("BlockBreakEventMonitor2");
-
 							player.removePotionEffect(PotionEffectType.INVISIBILITY);
 							player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
