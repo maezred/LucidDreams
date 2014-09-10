@@ -553,34 +553,14 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		final Player player = event.getPlayer();
-
-		if (player == null) {
-			return;
-		}
-
-		final UUID id = player.getUniqueId();
-
-		final PlayerData playerData = players.get(id);
-
-		if (playerData == null || !playerData.hasEffects) {
-			return;
-		}
-
 		final Block block = event.getBlock();
 
 		if (block == null || block.getType() != Material.BED_BLOCK) {
 			return;
 		}
 
-		final Location spawnLocation = player.getBedSpawnLocation();
-
-		if (spawnLocation == null) {
-			return;
-		}
-
-		final Location blockLocation = block.getLocation();
 		final Bed blockData = (Bed) block.getState().getData();
+		final Location blockLocation = block.getLocation();
 
 		final Block head, foot;
 
@@ -637,8 +617,6 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		System.out.println("BlockBreakEventMonitor");
-
 		final Location headLocation = head.getLocation();
 		final Location footLocation = foot.getLocation();
 
@@ -654,27 +632,36 @@ public class Listeners implements Listener {
 			BlockFace.NORTH_WEST
 		};
 
-		System.out.println("Spawn: " + spawnLocation);
-		System.out.println("Head: " + headLocation);
-		System.out.println("Foot: " + footLocation);
+		System.out.println("BlockBreakEventMonitor");
 
-		final Block spawnBlock = spawnLocation.getBlock();
+		for (Entry<UUID, PlayerData> entry : players.entrySet()) {
+			PlayerData playerData = entry.getValue();
+			Player player = playerData.player;
 
-		for (BlockFace face : faces) {
-			final Block checkBlock = spawnBlock.getRelative(face);
-			final Location checkLocation = checkBlock.getLocation();
+			if (player != null && playerData.hasEffects) {
+				final Location spawnLocation = player.getBedSpawnLocation();
 
-			System.out.println("Check " + face + ": " + checkLocation);
+				if (spawnLocation != null) {
+					final Block spawnBlock = spawnLocation.getBlock();
 
-			if (footLocation.equals(checkLocation) || headLocation.equals(checkLocation)) {
-				System.out.println("BlockBreakEventMonitor2");
+					for (BlockFace face : faces) {
+						final Block checkBlock = spawnBlock.getRelative(face);
+						final Location checkLocation = checkBlock.getLocation();
 
-				player.removePotionEffect(PotionEffectType.INVISIBILITY);
-				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+						System.out.println("Check " + face + ": " + checkLocation);
 
-				players.remove(id);
+						if (footLocation.equals(checkLocation) || headLocation.equals(checkLocation)) {
+							System.out.println("BlockBreakEventMonitor2");
 
-				player.sendMessage("You jolt awake as soon as you fall out of bed.");
+							player.removePotionEffect(PotionEffectType.INVISIBILITY);
+							player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+							players.remove(entry.getKey());
+
+							player.sendMessage("You jolt awake as soon as you fall out of bed.");
+						}
+					}
+				}
 			}
 		}
 	}
