@@ -633,7 +633,7 @@ public class Listeners implements Listener {
 		}
 
 		// Very unlikely.
-		if (head.getType() != Material.BED_BLOCK) {
+		if (head.getType() != Material.BED_BLOCK || foot.getType() != Material.BED_BLOCK) {
 			return;
 		}
 
