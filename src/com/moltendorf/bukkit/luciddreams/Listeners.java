@@ -198,10 +198,7 @@ public class Listeners implements Listener {
 			// Negate all damage dealt to the entity.
 			event.setCancelled(true);
 
-            player.addPotionEffects(Arrays.asList(
-                new PotionEffect(PotionEffectType.BLINDNESS, 40, 0),
-                new PotionEffect(PotionEffectType.SLOW, 20, 5)
-            ));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 
 			// The warning period lasts for two seconds.
 			playerData.nextWarning = currentWarning + 40;
