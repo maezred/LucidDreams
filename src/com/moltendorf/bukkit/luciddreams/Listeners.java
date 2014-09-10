@@ -658,7 +658,7 @@ public class Listeners implements Listener {
 
 							players.remove(entry.getKey());
 
-							player.sendMessage("You jolt awake as soon as you fall out of bed.");
+							player.sendMessage("You jolt awake as you fall out of bed.");
 
 							break;
 						}
