@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.material.Bed;
@@ -123,8 +124,12 @@ public class Listeners implements Listener {
 				break;
 
 			case PLAYER:
-				// Convert Entity to Player.
-				player = (Player) damager;
+                if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                    // Convert Entity to Player.
+                    player = (Player) damager;
+                } else {
+                    return;
+                }
 
 				break;
 
