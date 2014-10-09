@@ -41,6 +41,8 @@ public class Listeners implements Listener {
 
 	protected Listeners(final Plugin instance) {
 		plugin = instance;
+
+        world = plugin.getServer().getWorld("world");
 	}
 
 	protected void extendEffects(int duration) {
@@ -268,10 +270,6 @@ public class Listeners implements Listener {
 		if (fetchedPlayerData == null) {
 			playerData = new PlayerData(player);
 			players.put(id, playerData);
-
-			if (world == null) {
-				world = player.getWorld();
-			}
 		} else {
 			playerData = fetchedPlayerData;
 
