@@ -17,6 +17,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.material.Bed;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Arrays;
@@ -111,13 +112,13 @@ public class Listeners implements Listener {
 
 		final EntityType type = damager.getType();
 
-		final LivingEntity shooter;
+		final ProjectileSource shooter;
 
 		switch (type) {
 			case ARROW:
 				shooter = ((Arrow) damager).getShooter();
 
-				if (shooter != null && shooter.getType() == EntityType.PLAYER) {
+				if (shooter != null && shooter instanceof Player) {
 					player = (Player) shooter;
 				} else {
 					return;
@@ -138,7 +139,7 @@ public class Listeners implements Listener {
 			case SPLASH_POTION:
 				shooter = ((ThrownPotion) damager).getShooter();
 
-				if (shooter != null && shooter.getType() == EntityType.PLAYER) {
+				if (shooter != null && shooter instanceof Player) {
 					player = (Player) shooter;
 				} else {
 					return;
