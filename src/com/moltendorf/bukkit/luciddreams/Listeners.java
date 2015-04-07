@@ -565,56 +565,27 @@ public class Listeners implements Listener {
 		}
 
 		final Bed blockData = (Bed) block.getState().getData();
-		final Location blockLocation = block.getLocation();
-
 		final Block head, foot;
 
+		bed:
 		if (blockData.isHeadOfBed()) {
 			head = block;
 
-			switch (blockData.getFacing()) {
-				case NORTH:
-					foot = blockLocation.add(0, 0, 1).getBlock();
-					break;
+			// Bed.getFacing() is bugged for head of bed (always returns EAST).
+			for (BlockFace face : Arrays.asList(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)) {
+				Block test = block.getRelative(face);
 
-				case EAST:
-					foot = blockLocation.add(-1, 0, 0).getBlock();
-					break;
+				if (test.getType() == Material.BED_BLOCK && !((Bed) test.getState().getData()).isHeadOfBed()) {
+					foot = test;
 
-				case SOUTH:
-					foot = blockLocation.add(0, 0, -1).getBlock();
-					break;
-
-				case WEST:
-					foot = blockLocation.add(1, 0, 0).getBlock();
-					break;
-
-				default:
-					return;
+					break bed;
+				}
 			}
+
+			return;
 		} else {
+			head = block.getRelative(blockData.getFacing());
 			foot = block;
-
-			switch (blockData.getFacing()) {
-				case NORTH:
-					head = blockLocation.add(0, 0, -1).getBlock();
-					break;
-
-				case EAST:
-					head = blockLocation.add(1, 0, 0).getBlock();
-					break;
-
-				case SOUTH:
-					head = blockLocation.add(0, 0, 1).getBlock();
-					break;
-
-				case WEST:
-					head = blockLocation.add(-1, 0, 0).getBlock();
-					break;
-
-				default:
-					return;
-			}
 		}
 
 		// Very unlikely.
