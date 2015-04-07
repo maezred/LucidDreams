@@ -40,7 +40,7 @@ public class Listeners implements Listener {
 	protected Listeners(final Plugin instance) {
 		plugin = instance;
 
-        world = plugin.getServer().getWorld("world");
+		world = plugin.getServer().getWorld("world");
 	}
 
 	protected void extendEffects(int duration) {
@@ -124,12 +124,12 @@ public class Listeners implements Listener {
 				break;
 
 			case PLAYER:
-                if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-                    // Convert Entity to Player.
-                    player = (Player) damager;
-                } else {
-                    return;
-                }
+				if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+					// Convert Entity to Player.
+					player = (Player) damager;
+				} else {
+					return;
+				}
 
 				break;
 
@@ -277,28 +277,19 @@ public class Listeners implements Listener {
 			}
 		}
 
-		final Runnable runnable;
-
-		runnable = new Runnable() {
-
-			@Override
-			public void run() {
-
-				// Just for safety.
-				if (player.isSleeping()) {
-					if (playerData.hasEffects) {
-						player.sendMessage("You feel the warm covers in your dream.");
-					} else {
-						player.sendMessage("You slowly drift to sleep.");
-					}
-
-					playerData.readyForEffects = true;
-					playerData.taskFlagForEffects = null;
+		playerData.taskFlagForEffects = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+			// Just for safety.
+			if (player.isSleeping()) {
+				if (playerData.hasEffects) {
+					player.sendMessage("You feel the warm covers in your dream.");
+				} else {
+					player.sendMessage("You slowly drift to sleep.");
 				}
-			}
-		};
 
-		playerData.taskFlagForEffects = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 40);
+				playerData.readyForEffects = true;
+				playerData.taskFlagForEffects = null;
+			}
+		}, 40);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -319,114 +310,90 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		final Runnable runnable;
+		plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+			if (playerData.readyForEffects) {
+				// 23458 (the last moment a bed can be used).
+				// 23660 (the moment zombies and skeletons begin burning).
+				// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
+				int duration = 24260 - (int) world.getTime();
 
-		runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				if (playerData.readyForEffects) {
-					// 23458 (the last moment a bed can be used).
-					// 23660 (the moment zombies and skeletons begin burning).
-					// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
-					int duration = 24260 - (int) world.getTime();
-
-					// 24260 - 12541 (the first moment a bed can be used).
-					if (duration > 11719) {
-						if (world.hasStorm()) {
-							duration = world.getWeatherDuration() + 600;
-						} else {
-							duration = 0;
-						}
-					}
-
-					// Calculate custom duration for regeneration effect.
-					int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
-
-					if (duration > 0) {
-						playerData.nextWarning = world.getFullTime() + regenerationDuration;
-
-						if (playerData.hasEffects) {
-							player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
-
-							player.sendMessage("This dream world suddenly feels very cold.");
-						} else {
-							Creature creature;
-							Entity target;
-
-							for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
-								if (plugin.configuration.global.creatures.contains(entity.getType())) {
-									creature = (Creature) entity;
-									target = creature.getTarget();
-
-									if (target != null && target.getUniqueId() == id) {
-										creature.setTarget(null);
-									}
-								}
-							}
-
-							player.addPotionEffects(Arrays.asList(
-								new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
-								new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),
-								new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true)
-							));
-
-							player.sendMessage("You feel as if you're dreaming.");
-
-							playerData.hasEffects = true;
-
-							if (clock == null) {
-								final Runnable runnable;
-
-								runnable = new Runnable() {
-
-									@Override
-									public void run() {
-										if (world.hasStorm()) {
-											int ticks = world.getWeatherDuration() + 600;
-
-											extendEffects(ticks);
-
-											final Runnable runnable;
-
-											runnable = new Runnable() {
-
-												@Override
-												public void run() {
-													clock = null;
-
-													removeEffects();
-												}
-											};
-
-											clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, ticks);
-										} else {
-											clock = null;
-
-											removeEffects();
-										}
-									}
-								};
-
-								// Run the task 12 seconds before the effects run out to prevent screen flashing.
-								clock = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, duration - 240);
-							}
-						}
+				// 24260 - 12541 (the first moment a bed can be used).
+				if (duration > 11719) {
+					if (world.hasStorm()) {
+						duration = world.getWeatherDuration() + 600;
 					} else {
+						duration = 0;
+					}
+				}
+
+				// Calculate custom duration for regeneration effect.
+				int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
+
+				if (duration > 0) {
+					playerData.nextWarning = world.getFullTime() + regenerationDuration;
+
+					if (playerData.hasEffects) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
 
-						removeEffects();
+						player.sendMessage("This dream world suddenly feels very cold.");
+					} else {
+						Creature creature;
+						Entity target;
+
+						for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
+							if (plugin.configuration.global.creatures.contains(entity.getType())) {
+								creature = (Creature) entity;
+								target = creature.getTarget();
+
+								if (target != null && target.getUniqueId() == id) {
+									creature.setTarget(null);
+								}
+							}
+						}
+
+						player.addPotionEffects(Arrays.asList(
+							new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
+							new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),
+							new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true)
+						));
+
+						player.sendMessage("You feel as if you're dreaming.");
+
+						playerData.hasEffects = true;
+
+						if (clock == null) {
+							// Run the task 12 seconds before the effects run out to prevent screen flashing.
+							clock = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+								if (world.hasStorm()) {
+									int ticks = world.getWeatherDuration() + 600;
+
+									extendEffects(ticks);
+
+									clock = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+										clock = null;
+
+										removeEffects();
+									}, ticks);
+								} else {
+									clock = null;
+
+									removeEffects();
+								}
+							}, duration - 240);
+						}
 					}
+				} else {
+					player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
 
-					playerData.readyForEffects = false;
-				} else if (playerData.taskFlagForEffects != null) {
-					playerData.taskFlagForEffects.cancel();
-					playerData.taskFlagForEffects = null;
+					removeEffects();
 				}
-			}
-		};
 
-		plugin.getServer().getScheduler().runTaskLater(plugin, runnable, 0);
+				playerData.readyForEffects = false;
+			} else if (playerData.taskFlagForEffects != null) {
+				playerData.taskFlagForEffects.cancel();
+				playerData.taskFlagForEffects = null;
+			}
+		}, 0);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
