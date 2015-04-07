@@ -20,11 +20,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 /**
  * Listener register.
@@ -610,9 +607,11 @@ public class Listeners implements Listener {
 		};
 
 		// Iterate all players to see if any of them used this bed to start their dream.
-		for (Entry<UUID, PlayerData> entry : players.entrySet()) {
-			PlayerData playerData = entry.getValue();
-			Player player = playerData.player;
+		for (final Iterator<Entry<UUID, PlayerData>> iterator = players.entrySet().iterator(); iterator.hasNext(); ) {
+			final Map.Entry<UUID, PlayerData> entry = iterator.next();
+
+			final PlayerData playerData = entry.getValue();
+			final Player player = playerData.player;
 
 			if (player != null && playerData.hasEffects) {
 				final Location spawnLocation = player.getBedSpawnLocation();
@@ -630,7 +629,7 @@ public class Listeners implements Listener {
 							player.removePotionEffect(PotionEffectType.INVISIBILITY);
 							player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-							players.remove(entry.getKey());
+							iterator.remove();
 
 							player.sendMessage("You jolt awake as you fall out of bed.");
 
