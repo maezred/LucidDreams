@@ -1,4 +1,4 @@
-package com.moltendorf.bukkit.luciddreams;
+package net.moltendorf.Bukkit.LucidDreams;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,73 +29,11 @@ import java.util.Map.Entry;
  * @author moltendorf
  */
 public class Listeners implements Listener {
-
-	final protected Plugin plugin;
-
-	protected BukkitTask clock = null;
-	protected World world = null;
-
-	protected Map<UUID, PlayerData> players = new LinkedHashMap<>();
-
-	protected Listeners(final Plugin instance) {
-		plugin = instance;
-
-		world = plugin.getServer().getWorld("world");
-	}
-
-	protected void extendEffects(int duration) {
-		for (Entry<UUID, PlayerData> entry : players.entrySet()) {
-			PlayerData playerData = entry.getValue();
-			Player player = playerData.player;
-
-			if (player != null && playerData.hasEffects) {
-				player.removePotionEffect(PotionEffectType.INVISIBILITY);
-				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-
-				player.addPotionEffects(Arrays.asList(
-					new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
-					new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
-				));
-
-				player.sendMessage("You continue dreaming as the rain keeps pouring.");
-			}
-
-			if (playerData.taskFlagForEffects != null) {
-				playerData.taskFlagForEffects.cancel();
-			}
-		}
-	}
-
-	protected void removeEffects() {
-		if (clock != null) {
-			clock.cancel();
-			clock = null;
-		}
-
-		for (Entry<UUID, PlayerData> entry : players.entrySet()) {
-			PlayerData playerData = entry.getValue();
-			Player player = playerData.player;
-
-			if (player != null && playerData.hasEffects) {
-				player.removePotionEffect(PotionEffectType.INVISIBILITY);
-				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-
-				player.sendMessage("As you wake, you come to the grave realization that this was not a dream.");
-			}
-
-			if (playerData.taskFlagForEffects != null) {
-				playerData.taskFlagForEffects.cancel();
-			}
-		}
-
-		players.clear();
-	}
-
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void EntityDamageByEntityEventHandler(final EntityDamageByEntityEvent event) {
 
 		// Are we enabled at all?
-		if (!plugin.configuration.global.enabled) {
+		if (!Plugin.instance.configuration.global.enabled) {
 			return;
 		}
 
@@ -162,25 +100,25 @@ public class Listeners implements Listener {
 		final Entity entity = event.getEntity();
 		final UUID id = player.getUniqueId();
 
-		// No cancelling shooting yourself in the foot.
+		// No cancelling shooting yourself in the footReference.
 		if (entity.getUniqueId() == id) {
 			return;
 		}
 
-		final PlayerData playerData = players.get(id);
+		final PlayerHandler playerHandler = players.get(id);
 
-		if (playerData == null || !playerData.hasEffects) {
+		if (playerHandler == null || !playerHandler.effects) {
 			return;
 		}
 
 		EntityType targetType = event.getEntityType();
 
 		// Is this entity allowed to be attacked?
-		if (!plugin.configuration.global.disallowed.contains(targetType)) {
+		if (!Plugin.instance.configuration.global.disallowed.contains(targetType)) {
 			return;
 		}
 
-		if (plugin.configuration.global.creatures.contains(targetType)) {
+		if (Plugin.instance.configuration.global.creatures.contains(targetType)) {
 			final Creature creature = (Creature) entity;
 
 			final Entity target = creature.getTarget();
@@ -204,14 +142,14 @@ public class Listeners implements Listener {
 
 		long currentWarning = player.getWorld().getFullTime();
 
-		if (currentWarning > playerData.nextWarning) {
+		if (currentWarning > playerHandler.nextWarning) {
 			// Negate all damage dealt to the entity.
 			event.setCancelled(true);
 
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 
 			// The warning period lasts for two seconds.
-			playerData.nextWarning = currentWarning + 40;
+			playerHandler.nextWarning = currentWarning + 40;
 
 			player.sendMessage("You panic from the thought of the monsters.");
 		} else {
@@ -240,13 +178,13 @@ public class Listeners implements Listener {
 
 		final UUID id = entity.getUniqueId();
 
-		final PlayerData playerData = players.get(id);
+		final PlayerHandler playerHandler = players.get(id);
 
-		if (playerData == null) {
+		if (playerHandler == null) {
 			return;
 		}
 
-		if (playerData.hasEffects) {
+		if (playerHandler.effects) {
 			event.setCancelled(true);
 		}
 	}
@@ -259,35 +197,37 @@ public class Listeners implements Listener {
 			return;
 		}
 
+		System.out.println(((Bed) event.getBed().getState().getData()).isHeadOfBed());
+
 		final Player player = event.getPlayer();
 		final UUID id = player.getUniqueId();
 
-		final PlayerData playerData;
-		PlayerData fetchedPlayerData = players.get(id);
+		final PlayerHandler playerHandler;
+		PlayerHandler fetchedPlayerHandler = players.get(id);
 
-		if (fetchedPlayerData == null) {
-			playerData = new PlayerData(player);
-			players.put(id, playerData);
+		if (fetchedPlayerHandler == null) {
+			playerHandler = new PlayerHandler(player);
+			players.put(id, playerHandler);
 		} else {
-			playerData = fetchedPlayerData;
+			playerHandler = fetchedPlayerHandler;
 
-			if (playerData.taskFlagForEffects != null) {
-				playerData.taskFlagForEffects.cancel();
-				playerData.taskFlagForEffects = null;
+			if (playerHandler.taskFlagForEffects != null) {
+				playerHandler.taskFlagForEffects.cancel();
+				playerHandler.taskFlagForEffects = null;
 			}
 		}
 
-		playerData.taskFlagForEffects = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+		playerHandler.taskFlagForEffects = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
 			// Just for safety.
 			if (player.isSleeping()) {
-				if (playerData.hasEffects) {
+				if (playerHandler.effects) {
 					player.sendMessage("You feel the warm covers in your dream.");
 				} else {
 					player.sendMessage("You slowly drift to sleep.");
 				}
 
-				playerData.readyForEffects = true;
-				playerData.taskFlagForEffects = null;
+				playerHandler.readyForEffects = true;
+				playerHandler.taskFlagForEffects = null;
 			}
 		}, 40);
 	}
@@ -303,15 +243,15 @@ public class Listeners implements Listener {
 		final Player player = event.getPlayer();
 		final UUID id = player.getUniqueId();
 
-		final PlayerData playerData = players.get(id);
+		final PlayerHandler playerHandler = players.get(id);
 
-		if (playerData == null) {
+		if (playerHandler == null) {
 			// This shouldn't happen.
 			return;
 		}
 
 		plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-			if (playerData.readyForEffects) {
+			if (playerHandler.readyForEffects) {
 				// 23458 (the last moment a bed can be used).
 				// 23660 (the moment zombies and skeletons begin burning).
 				// 24260 (not a valid relative time, but thirty seconds after zombies and skeletons begin burning).
@@ -330,12 +270,12 @@ public class Listeners implements Listener {
 				int regenerationDuration = (int) ((player.getMaxHealth() - player.getHealth()) * 1.25 * 20.);
 
 				if (duration > 0) {
-					playerData.nextWarning = world.getFullTime() + regenerationDuration;
+					playerHandler.nextWarning = world.getFullTime() + regenerationDuration;
 
-					if (playerData.hasEffects) {
+					if (playerHandler.effects) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
 
-						player.sendMessage("This dream world suddenly feels very cold.");
+						player.sendMessage("This dream worldReference suddenly feels very cold.");
 					} else {
 						Creature creature;
 						Entity target;
@@ -359,7 +299,7 @@ public class Listeners implements Listener {
 
 						player.sendMessage("You feel as if you're dreaming.");
 
-						playerData.hasEffects = true;
+						playerHandler.effects = true;
 
 						if (clock == null) {
 							// Run the task 12 seconds before the effects run out to prevent screen flashing.
@@ -367,17 +307,17 @@ public class Listeners implements Listener {
 								if (world.hasStorm()) {
 									int ticks = world.getWeatherDuration() + 600;
 
-									extendEffects(ticks);
+									PlayerLookup.extendEffects(world.getUID(), ticks);
 
 									clock = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
 										clock = null;
 
-										removeEffects();
+										PlayerLookup.stopEffects(world.getUID());
 									}, ticks);
 								} else {
 									clock = null;
 
-									removeEffects();
+									PlayerLookup.stopEffects(world.getUID());
 								}
 							}, duration - 240);
 						}
@@ -385,13 +325,13 @@ public class Listeners implements Listener {
 				} else {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true));
 
-					removeEffects();
+					PlayerLookup.stopEffects(world.getUID());
 				}
 
-				playerData.readyForEffects = false;
-			} else if (playerData.taskFlagForEffects != null) {
-				playerData.taskFlagForEffects.cancel();
-				playerData.taskFlagForEffects = null;
+				playerHandler.readyForEffects = false;
+			} else if (playerHandler.taskFlagForEffects != null) {
+				playerHandler.taskFlagForEffects.cancel();
+				playerHandler.taskFlagForEffects = null;
 			}
 		}, 0);
 	}
@@ -408,9 +348,9 @@ public class Listeners implements Listener {
 			final Player player = event.getPlayer();
 			final UUID id = player.getUniqueId();
 
-			final PlayerData playerData = players.get(id);
+			final PlayerHandler playerHandler = players.get(id);
 
-			if (playerData == null) {
+			if (playerHandler == null) {
 				return;
 			}
 
@@ -431,15 +371,15 @@ public class Listeners implements Listener {
 		final Player player = event.getPlayer();
 		final UUID id = player.getUniqueId();
 
-		final PlayerData playerData = players.get(id);
+		final PlayerHandler playerHandler = players.get(id);
 
-		if (playerData == null) {
+		if (playerHandler == null) {
 			return;
 		}
 
-		playerData.player = null;
+		playerHandler.player = null;
 
-		if (!playerData.hasEffects) {
+		if (!playerHandler.effects) {
 			return;
 		}
 
@@ -459,9 +399,9 @@ public class Listeners implements Listener {
 		final Player player = event.getPlayer();
 		final UUID id = player.getUniqueId();
 
-		final PlayerData playerData = players.get(id);
+		final PlayerHandler playerHandler = players.get(id);
 
-		if (playerData == null) {
+		if (playerHandler == null) {
 			return;
 		}
 
@@ -479,15 +419,15 @@ public class Listeners implements Listener {
 		final Player player = event.getPlayer();
 		final UUID id = player.getUniqueId();
 
-		final PlayerData playerData = players.get(id);
+		final PlayerHandler playerHandler = players.get(id);
 
-		if (playerData == null) {
+		if (playerHandler == null) {
 			return;
 		}
 
-		playerData.player = player;
+		playerHandler.player = player;
 
-		if (!playerData.hasEffects) {
+		if (!playerHandler.effects) {
 			return;
 		}
 
@@ -521,8 +461,12 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		// We only use the input block to figure out which block is the head and the foot of the bed.
+		// We only use the input block to figure out which block is the headReference and the footReference of the bed.
 		final Block block = event.getBlock();
+
+		if (set == null) {
+			set = BedSet.getBedAt(block);
+		}
 
 		if (block == null || block.getType() != Material.BED_BLOCK) {
 			return;
@@ -535,7 +479,7 @@ public class Listeners implements Listener {
 		if (blockData.isHeadOfBed()) {
 			head = block;
 
-			// Bed.getFacing() is bugged for head of bed (always returns EAST).
+			// Bed.getFacing() is bugged for headReference of bed (always returns east when someone is sleeping in the bed).
 			for (BlockFace face : Arrays.asList(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)) {
 				Block test = block.getRelative(face);
 
@@ -574,13 +518,13 @@ public class Listeners implements Listener {
 		};
 
 		// Iterate all players to see if any of them used this bed to start their dream.
-		for (final Iterator<Entry<UUID, PlayerData>> iterator = players.entrySet().iterator(); iterator.hasNext(); ) {
-			final Map.Entry<UUID, PlayerData> entry = iterator.next();
+		for (final Iterator<Entry<UUID, PlayerHandler>> iterator = players.entrySet().iterator(); iterator.hasNext(); ) {
+			final Entry<UUID, PlayerHandler> entry = iterator.next();
 
-			final PlayerData playerData = entry.getValue();
-			final Player player = playerData.player;
+			final PlayerHandler playerHandler = entry.getValue();
+			final Player player = playerHandler.player;
 
-			if (player != null && playerData.hasEffects) {
+			if (player != null && playerHandler.effects) {
 				final Location spawnLocation = player.getBedSpawnLocation();
 
 				if (spawnLocation != null) {

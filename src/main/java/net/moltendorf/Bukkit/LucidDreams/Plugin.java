@@ -1,7 +1,5 @@
-package com.moltendorf.bukkit.luciddreams;
+package net.moltendorf.Bukkit.LucidDreams;
 
-import org.bukkit.Server;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -9,11 +7,15 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Plugin extends JavaPlugin {
 
+	// Main instance.
+	public static Plugin instance = null;
+
 	// Variable data.
 	protected Configuration configuration = null;
 
 	@Override
 	public synchronized void onDisable() {
+		instance = null;
 
 		// Clear data.
 		configuration = null;
@@ -21,6 +23,8 @@ public class Plugin extends JavaPlugin {
 
 	@Override
 	public synchronized void onEnable() {
+		// Store reference to this.
+		instance = this;
 
 		// Construct new configuration.
 		configuration = new Configuration();
@@ -30,13 +34,7 @@ public class Plugin extends JavaPlugin {
 			return;
 		}
 
-		// Get server.
-		final Server server = getServer();
-
-		// Get plugin manager.
-		final PluginManager manager = server.getPluginManager();
-
 		// Register our event listeners.
-		manager.registerEvents(new Listeners(this), this);
+		getServer().getPluginManager().registerEvents(new Listeners(), this);
 	}
 }

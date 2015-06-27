@@ -1,9 +1,8 @@
-package com.moltendorf.bukkit.luciddreams;
+package net.moltendorf.Bukkit.LucidDreams;
 
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Configuration class.
@@ -17,14 +16,19 @@ public class Configuration {
 		// Final data.
 		final protected boolean enabled = true; // Whether or not the plugin is enabled at all; useful for using it as an interface (default is true).
 
+		final protected List<String> worlds = new ArrayList<>(Collections.singletonList("world"));
+		final protected Set<UUID> worldIds;
+
 		final protected HashSet<EntityType> disallowed = new HashSet<>(Arrays.asList(
 			EntityType.BLAZE,
 			EntityType.CAVE_SPIDER,
 			EntityType.CREEPER,
 			EntityType.ENDERMAN,
+			EntityType.ENDERMITE,
 			EntityType.ENDER_DRAGON,
 			EntityType.GHAST,
 			EntityType.GIANT,
+			EntityType.GUARDIAN,
 			EntityType.IRON_GOLEM,
 			EntityType.MAGMA_CUBE,
 			EntityType.PIG_ZOMBIE,
@@ -44,7 +48,9 @@ public class Configuration {
 			EntityType.CAVE_SPIDER,
 			EntityType.CREEPER,
 			EntityType.ENDERMAN,
+			EntityType.ENDERMITE,
 			EntityType.GIANT,
+			EntityType.GUARDIAN,
 			EntityType.IRON_GOLEM,
 			EntityType.PIG_ZOMBIE,
 			EntityType.SILVERFISH,
@@ -55,6 +61,14 @@ public class Configuration {
 			EntityType.WOLF,
 			EntityType.ZOMBIE
 		));
+
+		public Global() {
+			worldIds = new LinkedHashSet<>();
+
+			for (final String world : worlds) {
+				 worldIds.add(Plugin.instance.getServer().getWorld(world).getUID());
+			}
+		}
 	}
 
 	// Final data.
