@@ -49,11 +49,9 @@ public class Listeners implements Listener {
 			Player player = playerData.player;
 
 			if (player != null && playerData.hasEffects) {
-				player.removePotionEffect(PotionEffectType.INVISIBILITY);
 				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-				player.addPotionEffects(Arrays.asList(
-					new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
+				player.addPotionEffects(Collections.singletonList(
 					new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
 				));
 
@@ -77,7 +75,6 @@ public class Listeners implements Listener {
 			Player player = playerData.player;
 
 			if (player != null && playerData.hasEffects) {
-				player.removePotionEffect(PotionEffectType.INVISIBILITY);
 				player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
 				player.sendMessage("As you wake, you come to the grave realization that this was not a dream.");
@@ -215,7 +212,6 @@ public class Listeners implements Listener {
 
 			player.sendMessage("You panic from the thought of the monsters.");
 		} else {
-			player.removePotionEffect(PotionEffectType.INVISIBILITY);
 			player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
 			players.remove(id);
@@ -352,7 +348,6 @@ public class Listeners implements Listener {
 						}
 
 						player.addPotionEffects(Arrays.asList(
-							new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
 							new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true),
 							new PotionEffect(PotionEffectType.REGENERATION, regenerationDuration, 1, true)
 						));
@@ -444,7 +439,6 @@ public class Listeners implements Listener {
 		}
 
 		// Remove effects.
-		player.removePotionEffect(PotionEffectType.INVISIBILITY);
 		player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 	}
 
@@ -494,7 +488,6 @@ public class Listeners implements Listener {
 		int time = (int) world.getTime();
 
 		// We need to fix the durations.
-		player.removePotionEffect(PotionEffectType.INVISIBILITY);
 		player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
 		int duration;
@@ -507,8 +500,7 @@ public class Listeners implements Listener {
 			return;
 		}
 
-		player.addPotionEffects(Arrays.asList(
-			new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0, true),
+		player.addPotionEffects(Collections.singletonList(
 			new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true)
 		));
 	}
@@ -593,7 +585,6 @@ public class Listeners implements Listener {
 
 						// Check if this location is the bed that was broken.
 						if (footLocation.equals(checkLocation) || headLocation.equals(checkLocation)) {
-							player.removePotionEffect(PotionEffectType.INVISIBILITY);
 							player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
 							iterator.remove();
